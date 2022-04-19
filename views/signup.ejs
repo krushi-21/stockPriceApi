@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>stock api</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
+    />
+
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <!-- partial:index.partial.html -->
+    <div id="login-form-wrap">
+      <h2>Sign Up</h2>
+      <form id="signup-form" action="/api/v1/users/signup" method="POST">
+        <p>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email Address"
+            required
+          /><i class="validation"><span></span><span></span></i>
+        </p>
+        <p>
+          <input
+            type="text"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+          /><i class="validation"><span></span><span></span></i>
+        </p>
+        <p>
+          <input type="submit" id="signup" value="Sign up" />
+        </p>
+      </form>
+      <div id="create-account-wrap">
+        <p>
+          Already have account?
+          <a href="http://localhost:3000/api/v1/users/login">Login here</a>
+        </p>
+        <p></p>
+      </div>
+
+      <!--create-account-wrap-->
+    </div>
+    <!--login-form-wrap-->
+    <!-- partial -->
+  </body>
+</html>

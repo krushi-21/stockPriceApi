@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
+import path from 'path';
 import logger from './config/logger.js';
 import db from './connections/db.js';
 import AppRoutes from './components/routes.js';
@@ -11,9 +12,12 @@ dotenv.config();
 const port = process.argv[2] || process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(morgan('dev'));
+app.use(express.static('views'));
+app.set('views', path.join(process.cwd().toString(), '/views'));
+app.set('view engine', 'ejs');
 
 app.use('/api/v1', AppRoutes);
 

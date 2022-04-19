@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>stock api</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
+    />
+
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <!-- <script>
+    // Get the modal
+    var modal = document.getElementById('login');
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+      console.log('hello');
+    };
+  </script> -->
+  <body>
+    <!-- partial:index.partial.html -->
+    <div id="login-form-wrap">
+      <h2>Login</h2>
+
+      <form id="login-form" action="/api/v1/users/login" method="POST">
+        <p>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email Address"
+            required
+          /><i class="validation"><span></span><span></span></i>
+        </p>
+        <p>
+          <input
+            type="text"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+          /><i class="validation"><span></span><span></span></i>
+        </p>
+        <p>
+          <input type="submit" id="login" value="Login" />
+        </p>
+      </form>
+      <div id="create-account-wrap">
+        <p>
+          Not a member?
+          <a href="http://localhost:3000/api/v1/users/signup">Create Account</a>
+        </p>
+        <p></p>
+      </div>
+
+      <!--create-account-wrap-->
+    </div>
+    <!--login-form-wrap-->
+    <!-- partial -->
+  </body>
+</html>
