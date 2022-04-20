@@ -19,7 +19,7 @@ const createSendToken = (user, statusCode, req, res) => {
   // Remove password from output
   user.password = undefined;
 
-  res.redirect('/homescreen');
+  res.redirect('/api/v1/home/stockapi');
 };
 
 const signup = catchAsync(async (req, res, next) => {

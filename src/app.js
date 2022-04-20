@@ -15,7 +15,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(morgan('dev'));
-app.use(express.static('views'));
+const pubpath = path.join(process.cwd().toString(), 'src/public');
+
+app.use(express.static(pubpath));
+app.use('/js', express.static(pubpath));
+app.use('/css', express.static(pubpath));
+
 app.set('views', path.join(process.cwd().toString(), '/views'));
 app.set('view engine', 'ejs');
 
