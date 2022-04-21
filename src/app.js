@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import path from 'path';
+import bodyParser from 'body-parser';
 import logger from './config/logger.js';
 import db from './connections/db.js';
 import AppRoutes from './components/routes.js';
@@ -13,6 +14,12 @@ const port = process.argv[2] || process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(morgan('dev'));
 const pubpath = path.join(process.cwd().toString(), 'src/public');

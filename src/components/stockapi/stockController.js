@@ -1,13 +1,9 @@
 import catchAsync from '../../helpers/catchAsync.js';
 import axios from 'axios';
 import { DateTime } from 'luxon';
+import Stocks from './stockModel.js';
 
-const getStockData = catchAsync(async (req, res, next) => {
-  const { stockName } = req.body;
-  console.log(stockName);
-  const stockData = await searchStonks(stockName);
-
-  //ohlc graph
+async function getChartData(stockData, stockName) {
   var ohlc = [],
     volume = [],
     dataLength = stockData.data['Time Series (5min)'];
@@ -31,7 +27,46 @@ const getStockData = catchAsync(async (req, res, next) => {
       Number(stock_info['5. volume']), // the volume
     ]);
   }
-  res.status(200).json(ohlc);
+
+  const storeInDB = await Stocks.create({
+    stockName: stockName,
+    data: ohlc,
+  });
+  return ohlc;
+}
+
+const getStockData = catchAsync(async (req, res, next) => {
+  console.log('in get stonks');
+  const { stockName } = req.body;
+
+  const data = await searchStonksInDB(stockName.toUpperCase());
+
+  if (data) {
+    console.log('stock name' + data.stockName);
+    var data1 = JSON.stringify(data.data);
+    return res.render('homescreen', {
+      ohlc: data1,
+      error: null,
+      name: data.stockName,
+    });
+  }
+
+  const stockData = await searchStonks(stockName);
+  if (!stockData.data['Error Message']) {
+    var ohlc = await getChartData(stockData, stockName);
+    var data1 = JSON.stringify(ohlc);
+    return res.render('homescreen', {
+      ohlc: data1,
+      error: null,
+      name: stockName,
+    });
+  }
+
+  return res.render('homescreen', {
+    ohlc: null,
+    error: 'Invalid name',
+    name: null,
+  });
 });
 
 export default {
@@ -40,6 +75,13 @@ export default {
 
 async function searchStonks(stockName) {
   var url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${stockName}&interval=5min&apikey=${process.env.API_KEY}`;
+  var url1 = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${stockName}&apikey=${process.env.API_KEY}`;
   const response = await axios(url);
+
   return response;
+}
+
+async function searchStonksInDB(stockName) {
+  const stock = await Stocks.findOne({ stockName });
+  return stock;
 }

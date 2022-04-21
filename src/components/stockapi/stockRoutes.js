@@ -6,7 +6,7 @@ const router = express.Router();
 router
   .post('/stockapi', stockController.getStockData)
   .get('/stockapi', function (req, res) {
-    res.render('chart');
+    res.render('homescreen', { ohlc: null, error: null, name: null });
   });
 
 export default router;
