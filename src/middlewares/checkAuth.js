@@ -4,6 +4,8 @@ function checkUserAuth(req, res, next) {
   const sessionCookie = req.cookies.jwt;
   const verify = verifyToken(sessionCookie);
   if (verify) {
+    req.user = verify.id;
+
     return next();
   }
   return res.render('unauthenticated');
