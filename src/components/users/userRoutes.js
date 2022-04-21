@@ -17,5 +17,9 @@ router
     res.render('forgotPassword');
   });
 router.patch('/resetPassword/:token', userController.resetPassword);
+router.get('/logout', (req, res) => {
+  res.clearCookie('jwt');
+  res.redirect('login');
+});
 
 export default router;
