@@ -1,23 +1,14 @@
 import nodeCron from 'node-cron';
-import Stocks from '../components/stockapi/stockModel.js';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import axios from 'axios';
 import { DateTime } from 'luxon';
-dotenv.config();
 
+import Stocks from '../components/stockapi/stockModel.js';
 //'*/1 * * * *' every 1 min.
 //'59 23 * * *' every day 23:59PM
 
-const DB = process.env.MONGO_PATH;
+console.log('scanner runniing');
 
-const db = mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('DB connected Successfully!'));
-nodeCron.schedule('59 23 * * *', async () => {
+var scanner = nodeCron.schedule('59 23 * * *', async () => {
   console.log('scheduler => archived');
   const stock = await Stocks.find().select('stockName -_id');
   console.log(stock);
@@ -62,3 +53,5 @@ async function getChartData(stockData, stockName) {
     console.log(data);
   }
 }
+
+export default scanner;

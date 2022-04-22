@@ -1,4 +1,6 @@
 import { verifyToken } from '../helpers/jwtHelper.js';
+
+//check auth
 function checkUserAuth(req, res, next) {
   //get cookie
   const sessionCookie = req.cookies.jwt;

@@ -3,11 +3,14 @@ import axios from 'axios';
 import { DateTime } from 'luxon';
 import Stocks from './stockModel.js';
 import StockSearchDB from './stockSearchModel.js';
+import logger from '../../config/logger.js';
 
+//get chart data function
 async function getChartData(stockData, stockName, userId) {
   var ohlc = [],
     volume = [],
     dataLength = stockData.data['Time Series (5min)'];
+  //remove unnecessary data from api response
   for (var time in dataLength) {
     var stock_info = dataLength[time];
     var date = DateTime.fromSQL(time).ts;
@@ -28,24 +31,25 @@ async function getChartData(stockData, stockName, userId) {
       Number(stock_info['5. volume']), // the volume
     ]);
   }
-
+  //store data in db
   const storeInDB = await Stocks.create({
     stockName: stockName,
     data: ohlc,
   });
+  //store search history in db
   await storeSearchInDB(stockName, storeInDB.id, userId);
   return ohlc;
 }
 
 const getStockData = catchAsync(async (req, res, next) => {
-  console.log('in get stonks');
+  logger.info('in get stonks');
   const { stockName } = req.body;
 
   const data = await searchStonksInDB(stockName.toUpperCase());
 
   if (data) {
-    await storeSearchInDB(data.stockName, data.id, req.user.id);
-    console.log('stock name' + data.stockName);
+    await storeSearchInDB(data.stockName, data.id, req.user);
+    logger.info('stock name' + data.stockName);
     var data1 = JSON.stringify(data.data);
     return res.render('homescreen', {
       ohlc: data1,
@@ -72,30 +76,32 @@ const getStockData = catchAsync(async (req, res, next) => {
   });
 });
 
-export default {
-  getStockData,
-  searchStonks,
-  getChartData,
-};
-
+//search stocks data from api
 async function searchStonks(stockName) {
+  //for intraday
   var url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${stockName}&interval=5min&apikey=${process.env.API_KEY}`;
+  //for 7days
   var url1 = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${stockName}&apikey=${process.env.API_KEY}`;
   const response = await axios(url);
-
+  //return response
   return response;
 }
 
+//search data in DB
 async function searchStonksInDB(stockName) {
   const stock = await Stocks.findOne({ stockName });
   return stock;
 }
 
+//store search data in db
 async function storeSearchInDB(stockName, dataId, userId) {
-  const stock = await StockSearchDB.findOne({ stockName });
+  console.log('user id ' + userId);
+  //check if data already availble
+  const stock = await StockSearchDB.findOne({ stockName, user: userId });
   if (stock) {
     return;
   }
+  //if not store in db
   const storeSearchInDB = await StockSearchDB.create({
     stockName: stockName,
     user: userId,
@@ -103,3 +109,7 @@ async function storeSearchInDB(stockName, dataId, userId) {
   });
   return;
 }
+
+export default {
+  getStockData,
+};
