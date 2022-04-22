@@ -74,6 +74,8 @@ const getStockData = catchAsync(async (req, res, next) => {
 
 export default {
   getStockData,
+  searchStonks,
+  getChartData,
 };
 
 async function searchStonks(stockName) {
