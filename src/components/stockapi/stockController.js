@@ -2,8 +2,9 @@ import catchAsync from '../../helpers/catchAsync.js';
 import axios from 'axios';
 import { DateTime } from 'luxon';
 import Stocks from './stockModel.js';
+import StockSearchDB from './stockSearchModel.js';
 
-async function getChartData(stockData, stockName) {
+async function getChartData(stockData, stockName, userId) {
   var ohlc = [],
     volume = [],
     dataLength = stockData.data['Time Series (5min)'];
@@ -32,6 +33,7 @@ async function getChartData(stockData, stockName) {
     stockName: stockName,
     data: ohlc,
   });
+  await storeSearchInDB(stockName, storeInDB.id, userId);
   return ohlc;
 }
 
@@ -42,6 +44,7 @@ const getStockData = catchAsync(async (req, res, next) => {
   const data = await searchStonksInDB(stockName.toUpperCase());
 
   if (data) {
+    await storeSearchInDB(data.stockName, data.id, req.user.id);
     console.log('stock name' + data.stockName);
     var data1 = JSON.stringify(data.data);
     return res.render('homescreen', {
@@ -53,7 +56,7 @@ const getStockData = catchAsync(async (req, res, next) => {
 
   const stockData = await searchStonks(stockName);
   if (!stockData.data['Error Message']) {
-    var ohlc = await getChartData(stockData, stockName);
+    var ohlc = await getChartData(stockData, stockName, req.user.id);
     var data1 = JSON.stringify(ohlc);
     return res.render('homescreen', {
       ohlc: data1,
@@ -84,4 +87,17 @@ async function searchStonks(stockName) {
 async function searchStonksInDB(stockName) {
   const stock = await Stocks.findOne({ stockName });
   return stock;
+}
+
+async function storeSearchInDB(stockName, dataId, userId) {
+  const stock = await StockSearchDB.findOne({ stockName });
+  if (stock) {
+    return;
+  }
+  const storeSearchInDB = await StockSearchDB.create({
+    stockName: stockName,
+    user: userId,
+    data: dataId,
+  });
+  return;
 }
